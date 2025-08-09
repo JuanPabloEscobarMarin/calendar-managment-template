@@ -1,0 +1,9 @@
+/* Importa las directivas base de TailwindCSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Se pueden añadir estilos globales adicionales aquí si es necesario */
+body {
+  @apply bg-gray-50;
+}
