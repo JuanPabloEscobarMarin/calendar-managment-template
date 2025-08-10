@@ -17,6 +17,8 @@ export interface Service {
   price: number;
   /** Duración aproximada (por ejemplo “60 min”) */
   duration: string;
+  /** Indica si es obligatorio realizar una valoración antes de reservar la cita */
+  requiresEvaluation?: boolean;
 }
 
 export interface Product {
@@ -49,35 +51,29 @@ export interface AppConfig {
  * diferentes instancias del sistema sin tocar el resto del código.
  */
 export const defaultConfig: AppConfig = {
-  siteName: "Nombre Web",
-  businessName: "Nombre del Negocio",
-  tagline: "Aqui va un eslogan bacano",
-  contactPhone: "+57 3218426226",
-  contactEmail: "corrreoNegocio@gmail.com",
+  siteName: "Beauty Booking",
+  businessName: "Mi Cosmetóloga",
+  tagline: "Tu belleza, nuestra pasión",
+  contactPhone: "+57 123 456 789",
+  contactEmail: "contacto@micomsetologa.com",
   services: [
     {
       id: "svc-1",
       name: "Limpieza facial",
       category: "Facial",
       description: "Tratamiento de limpieza profunda y exfoliación.",
-      price: 120.0,
+      price: 120,
       duration: "60 min",
+      requiresEvaluation: true,
     },
     {
       id: "svc-2",
       name: "Masaje relajante",
       category: "Corporal",
       description: "Masaje corporal completo para aliviar tensiones.",
-      price: 150.0,
+      price: 150,
       duration: "75 min",
-    },
-    {
-      id: "svc-3",
-      name: "Encendida a Monda",
-      category: "Corporal",
-      description: "Literalmente te vamos a encender a monda.",
-      price: 0,
-      duration: "25 min",
+      requiresEvaluation: false,
     },
   ],
   products: [

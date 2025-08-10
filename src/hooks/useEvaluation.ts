@@ -1,42 +1,54 @@
-import { useState, useEffect } from 'react';
-import type { Evaluation } from '../types';
+import { useState, useEffect } from "react";
+import type { Evaluation } from "../types";
+import { supabase } from "../utils/supabaseClient";
 
 /**
- * Hook para gestionar solicitudes de valoración.  Similar a `useBookings`,
- * persiste los datos en `localStorage` y ofrece funciones para
- * añadir nuevas solicitudes y buscarlas por ID.  Esto permite que la
- * plantilla funcione sin un back‑end real, aunque en una solución
- * profesional se conectarían a un API.
+ * Hook para gestionar solicitudes de valoración con Supabase.  Carga
+ * registros de la tabla `evaluations` y permite insertar nuevos.
+ * Se requiere una tabla en Supabase con las columnas: id (text, PK),
+ * serviceId, name, phone, evaluationType, dateTime (timestamp opcional),
+ * images (jsonb o text[]).  Para subir imágenes reales, deberás usar
+ * Supabase Storage; aquí solo se almacena la lista de nombres.
  */
 export const useEvaluation = () => {
   const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem('evaluations');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as Evaluation[];
-        setEvaluations(parsed);
-      } catch {
-        // ignorar
+    const fetchEvaluations = async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from("evaluations").select("*");
+      if (!error && data) {
+        setEvaluations(data as Evaluation[]);
       }
-    }
+      if (!error && data) {
+        setEvaluations(data);
+      }
+      setLoading(false);
+    };
+    fetchEvaluations();
   }, []);
 
-  useEffect(() => {
-    window.localStorage.setItem('evaluations', JSON.stringify(evaluations));
-  }, [evaluations]);
-
-  const addEvaluation = async (evalData: Omit<Evaluation, 'id'>): Promise<Evaluation> => {
+  const addEvaluation = async (
+    evalData: Omit<Evaluation, "id">
+  ): Promise<Evaluation> => {
     const id = `ev-${Date.now()}`;
-    const newEval: Evaluation = { id, ...evalData };
-    setEvaluations((prev) => [...prev, newEval]);
-    return newEval;
+    const payload = { id, ...evalData };
+    const { data, error } = await supabase
+      .from("evaluations")
+      .insert(payload)
+      .select()
+      .single();
+    if (error || !data) {
+      throw new Error(error?.message || "Error al crear la valoración");
+    }
+    setEvaluations((prev) => [...prev, data]);
+    return data;
   };
 
   const getEvaluationById = (id: string): Evaluation | undefined => {
     return evaluations.find((ev) => ev.id === id);
   };
 
-  return { evaluations, addEvaluation, getEvaluationById };
+  return { evaluations, addEvaluation, getEvaluationById, loading };
 };

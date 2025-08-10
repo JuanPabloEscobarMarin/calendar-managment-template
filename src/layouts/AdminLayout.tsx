@@ -1,5 +1,5 @@
-import React from 'react';
-import { Header } from '../components/Header';
+import React from "react";
+import { Header } from "../components/Header";
 
 /**
  * Layout sencillo para el panel de administración.  Por defecto reutiliza
@@ -7,7 +7,9 @@ import { Header } from '../components/Header';
  * podrías utilizar un menú o cabecera distinto.  No se incluye footer
  * para maximizar el área de gestión.
  */
-export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useConfig } from "../../contexts/ConfigContext";
 import { useBookings } from "../../hooks/useBookings";
 
@@ -41,6 +41,25 @@ export const BookingForm: React.FC = () => {
   };
 
   const selectedService = services.find((s) => s.id === serviceId);
+
+  // Si el servicio requiere una valoración previa, mostrar mensaje y botón para solicitarla
+  if (selectedService?.requiresEvaluation) {
+    return (
+      <div className="max-w-lg mx-auto bg-white p-6 rounded shadow-md space-y-4">
+        <h2 className="text-xl font-semibold text-gray-800">Reservar cita</h2>
+        <p className="text-sm text-gray-700">
+          Este servicio requiere una valoración previa. Por favor solicita una
+          valoración antes de reservar tu cita.
+        </p>
+        <Link
+          to={`/evaluation?serviceId=${selectedService.id}`}
+          className="inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 text-sm"
+        >
+          Solicitar valoración
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <form

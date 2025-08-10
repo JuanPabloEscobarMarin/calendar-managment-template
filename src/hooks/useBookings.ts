@@ -1,53 +1,56 @@
 import { useState, useEffect } from 'react';
 import type { Booking } from '../types';
+import { supabase } from '../utils/supabaseClient';
 
 /**
- * Hook sencillo para gestionar el estado de las reservas.  Utiliza
- * `localStorage` para persistir datos entre sesiones del navegador.  Las
- * funciones devueltas permiten añadir una nueva reserva y obtener una
- * reserva concreta por su identificador.  En un proyecto real se
- * remplazaría este hook por llamadas a un servicio back‑end.
+ * Hook para gestionar reservas mediante Supabase.  Carga las reservas
+ * desde la tabla `bookings` al montarse y proporciona funciones para
+ * insertar nuevas reservas y consultar por ID.  Requiere que hayas
+ * creado una tabla `bookings` en tu proyecto de Supabase con las
+ * columnas: id (text, PK), serviceId (text), name (text), phone (text),
+ * dateTime (timestamp), sessions (integer, opcional).
  */
 export const useBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Cargar reservas desde localStorage al iniciar
+  // Cargar reservas desde Supabase al iniciar
   useEffect(() => {
-    const stored = window.localStorage.getItem('bookings');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as Booking[];
-        setBookings(parsed);
-      } catch {
-        // Ignorar valores corruptos
+    const fetchBookings = async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from('bookings').select('*');
+      if (!error && data) {
+        setBookings(data as Booking[]);
       }
-    }
+      setLoading(false);
+    };
+    fetchBookings();
   }, []);
 
-  // Guardar reservas en localStorage cada vez que cambien
-  useEffect(() => {
-    window.localStorage.setItem('bookings', JSON.stringify(bookings));
-  }, [bookings]);
-
   /**
-   * Añade una nueva reserva y devuelve el objeto creado.  Se genera un
-   * identificador simple basado en la fecha/hora actual.  La función
-   * devuelve una promesa para simular una llamada asíncrona.
+   * Inserta una reserva en Supabase y actualiza el estado local.  Se
+   * genera un identificador basado en la fecha/hora actual, pero
+   * podrías definir la columna `id` con un valor por defecto para que
+   * lo genere la base de datos.  Devuelve la reserva creada.
    */
   const addBooking = async (booking: Omit<Booking, 'id'>): Promise<Booking> => {
     const id = `bk-${Date.now()}`;
-    const newBooking: Booking = { id, ...booking };
-    setBookings((prev) => [...prev, newBooking]);
-    return newBooking;
+    const payload = { id, ...booking };
+    const { data, error } = await supabase
+      .from('bookings')
+      .insert(payload)
+      .select()
+      .single();
+    if (error || !data) {
+      throw new Error(error?.message || 'Error al crear la reserva');
+    }
+    setBookings((prev) => [...prev, data]);
+    return data as Booking;
   };
 
-  /**
-   * Devuelve una reserva a partir de su identificador.  Si no se
-   * encuentra ninguna, devuelve `undefined`.
-   */
   const getBookingById = (id: string): Booking | undefined => {
     return bookings.find((b) => b.id === id);
   };
 
-  return { bookings, addBooking, getBookingById };
+  return { bookings, addBooking, getBookingById, loading };
 };

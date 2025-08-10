@@ -1,17 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import ServicesPage from './pages/Services';
-import ServiceDetailsPage from './pages/ServiceDetailsPage';
-import BookingPage from './pages/BookingPage';
-import EvaluationPage from './pages/EvaluationPage';
-import ProductsPage from './pages/ProductsPage';
-import ReviewsPage from './pages/ReviewsPage';
-import AdminDashboard from './pages/AdminDashboard';
-import { PublicLayout } from './layouts/PublicLayout';
-import { AdminLayout } from './layouts/AdminLayout';
-import { BookingConfirmation } from './features/booking/BookingConfirmation';
-import { EvaluationConfirmation } from './features/evaluation/EvaluationConfirmation';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import ServicesPage from "./pages/Services";
+import ServiceDetailsPage from "./pages/ServiceDetailsPage";
+import BookingPage from "./pages/BookingPage";
+import EvaluationPage from "./pages/EvaluationPage";
+import ProductsPage from "./pages/ProductsPage";
+import ReviewsPage from "./pages/ReviewsPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import { PublicLayout } from "./layouts/PublicLayout";
+import { AdminLayout } from "./layouts/AdminLayout";
+import { BookingConfirmation } from "./features/booking/BookingConfirmation";
+import { EvaluationConfirmation } from "./features/evaluation/EvaluationConfirmation";
 
 /**
  * Componente principal de la aplicación.  Define las rutas y los

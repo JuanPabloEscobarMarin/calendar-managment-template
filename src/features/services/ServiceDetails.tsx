@@ -31,9 +31,34 @@ export const ServiceDetails: React.FC = () => {
       <p className="text-gray-700 mb-2">Duración: {service.duration}</p>
       <p className="text-gray-700 mb-4">Precio: ${service.price.toFixed(0)}</p>
       <p className="text-gray-600 mb-6">{service.description}</p>
-      <div className="flex space-x-4">
-        <Link to={`/booking?serviceId=${service.id}`} className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 text-sm">Reservar cita</Link>
-        <Link to={`/evaluation?serviceId=${service.id}`} className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 text-sm">Solicitar valoración</Link>
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
+        {/* Si el servicio requiere valoración previa, mostrar solo el botón de valoración */}
+        {service.requiresEvaluation ? (
+          <>
+            <p className="text-sm text-red-600 mb-2 sm:mb-0">Este servicio requiere valoración previa.</p>
+            <Link
+              to={`/evaluation?serviceId=${service.id}`}
+              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 text-sm"
+            >
+              Solicitar valoración
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link
+              to={`/booking?serviceId=${service.id}`}
+              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 text-sm"
+            >
+              Reservar cita
+            </Link>
+            <Link
+              to={`/evaluation?serviceId=${service.id}`}
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 text-sm"
+            >
+              Solicitar valoración
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );
