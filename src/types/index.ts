@@ -15,6 +15,8 @@ export interface Booking {
   dateTime: string;
   /** Número de sesiones reservadas; algunos servicios se venden en paquetes */
   sessions?: number;
+  /** Duración del servicio en minutos; opcional para facilitar comprobaciones del servidor */
+  durationMinutes?: number;
 }
 
 /** Representa una solicitud de valoración o diagnóstico. */
@@ -24,11 +26,12 @@ export interface Evaluation {
   name: string;
   phone: string;
   /** Tipo de valoración: en línea con fotos o presencial en cabina */
-  evaluationType: 'online' | 'presencial';
+  evaluationType: "online" | "presencial";
   /** Fecha y hora solicitada para valoraciones presenciales */
   dateTime?: string;
   /** Archivos de imágenes proporcionados por el cliente en valoraciones online */
   images?: File[];
+  durationMinutes: 30; // Default to 30 minutes for online evaluations
 }
 
 /** Representa una opinión o reseña dejada por un cliente. */
