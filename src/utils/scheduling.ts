@@ -1,5 +1,4 @@
 import type { WorkingHours, Service } from "../config/appConfig";
-import type { Booking } from "../types";
 
 /** Parse 'HH:MM' => minutes since 00:00 */
 export function parseHmToMinutes(hhmm: string): number {
@@ -67,13 +66,17 @@ function workDayEdge(dateIso: string, hm: string): Date {
   return dateFromIsoAndHmLocal(dateIso, hm);
 }
 
-/** Filter slots by minLeadMinutes and overlap against existing bookings */
+/**
+ * Filtra slots por minLeadMinutes y evita solapes con EXISTENTES (reservas y/o valoraciones).
+ * IMPORTANTE: `existing` acepta cualquier elemento con { dateTime, durationMinutes? }.
+ * Así puedes pasar bookings y valoraciones juntas.
+ */
 export function filterAvailableSlots(params: {
   dateIso: string;
   slots: string[];
   service: Service;
   wh: WorkingHours;
-  existing: Booking[];
+  existing: Array<{ dateTime: string; durationMinutes?: number }>;
 }): string[] {
   const { dateIso, slots, service, wh, existing } = params;
 
@@ -84,22 +87,23 @@ export function filterAvailableSlots(params: {
   const workStart = workDayEdge(dateIso, wh.start);
   const workEnd = workDayEdge(dateIso, wh.end);
 
-  // Proyectar reservas existentes del día a [start, end)
-  // (si vienen más de otros días, filtramos aquí por seguridad)
+  // Proyectar EXISTENTES (bookings/valoraciones) del mismo día a [bStart, bEnd)
   const existingWindows = existing
-    .filter((b) => toIsoDate(new Date(b.dateTime)) === dateIso)
-    .map((b) => {
-      const bStart = new Date(b.dateTime);
-      const durMin =
-        (b as any).durationMinutes ??
-        service.durationMinutes ?? // fallback razonable si faltara en DB
-        wh.slotMinutes;
-      const bEnd = new Date(bStart.getTime() + Math.max(1, durMin) * 60 * 1000);
+    .filter((x) => toIsoDate(new Date(x.dateTime)) === dateIso)
+    .map((x) => {
+      const bStart = new Date(x.dateTime);
+      const durMin = Math.max(
+        1,
+        x.durationMinutes ??
+          service.durationMinutes ?? // fallback si faltara en DB
+          wh.slotMinutes
+      );
+      const bEnd = new Date(bStart.getTime() + durMin * 60 * 1000);
       return { bStart, bEnd };
     });
 
   return slots.filter((hhmm) => {
-    // Inicio y fin del slot solicitado
+    // Inicio y fin del slot solicitado para el servicio seleccionado
     const start = dateFromIsoAndHmLocal(dateIso, hhmm);
     if (start < leadLimit) return false;
 
@@ -110,10 +114,9 @@ export function filterAvailableSlots(params: {
     if (start < workStart || end > workEnd) return false;
 
     // No debe solaparse con ninguna ventana existente [start, end)
-    const overlaps = existingWindows.some(({ bStart, bEnd }) => {
-      return start < bEnd && bStart < end;
-    });
-
-    return !overlaps;
+    const collide = existingWindows.some(
+      ({ bStart, bEnd }) => start < bEnd && bStart < end
+    );
+    return !collide;
   });
 }

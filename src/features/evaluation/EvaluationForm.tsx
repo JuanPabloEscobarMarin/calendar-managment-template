@@ -24,8 +24,8 @@ export const EvaluationForm: React.FC = () => {
   );
   const [dateIso, setDateIso] = useState<string>(toIsoDate(new Date()));
   const [slot, setSlot] = useState<string>("");
-  const { addEvaluation } = useEvaluation();
-  const { bookings } = useBookings(); // para evitar solapes si comparten recurso
+  const { evaluations, addEvaluation } = useEvaluation();
+  const { bookings } = useBookings(); // para evitar solapes con reservas
   const navigate = useNavigate();
 
   const selectedService = useMemo(
@@ -33,45 +33,72 @@ export const EvaluationForm: React.FC = () => {
     [services, serviceId]
   );
 
+  // Slots base del día (alineados con workingHours.slotMinutes)
   const baseSlots = useMemo(
     () => generateDaySlots(new Date(dateIso + "T00:00:00"), workingHours),
     [dateIso, workingHours]
   );
 
+  // Reservas del día
   const dayBookings = useMemo(
     () => bookings.filter((b) => b.dateTime.startsWith(dateIso)),
     [bookings, dateIso]
   );
 
-  // Para valoraciones presenciales, usa una duración por defecto (30 min) o la del servicio si aplica
-  const evalDuration = selectedService?.durationMinutes
-    ? Math.min(selectedService.durationMinutes, 60)
-    : 30;
+  // Valoraciones presenciales del día (todas duran 30 minutos)
+  const dayEvals = useMemo(
+    () =>
+      evaluations
+        .filter(
+          (ev) =>
+            ev.evaluationType === "presencial" &&
+            (ev.dateTime || "").startsWith(dateIso)
+        )
+        .map((ev) => ({
+          dateTime: ev.dateTime as string,
+          durationMinutes: 30,
+        })),
+    [evaluations, dateIso]
+  );
 
+  // Duración fija de valoración presencial
+  const evalDuration = 30;
+
+  // Cálculo de disponibilidad combinando reservas + valoraciones presenciales
   const availableSlots = useMemo(() => {
     if (evaluationType !== "presencial") return [];
-    // Mapeamos un servicio temporal con la duración de evaluación
-    const tempService = {
-      ...(selectedService || { durationMinutes: evalDuration }),
-      durationMinutes: evalDuration,
-    } as any;
+    // “Servicio temporal” para pasar la duración al filtro
+    const tempService = { durationMinutes: evalDuration } as any;
     return filterAvailableSlots({
       dateIso,
       slots: baseSlots,
       service: tempService,
       wh: workingHours,
-      existing: dayBookings,
+      existing: [
+        // bookings del día con su duración
+        ...dayBookings.map((b) => ({
+          dateTime: b.dateTime,
+          durationMinutes:
+            (b as any).durationMinutes ??
+            selectedService?.durationMinutes ??
+            workingHours.slotMinutes,
+        })),
+        // valoraciones presenciales: siempre 30 min
+        ...dayEvals,
+      ],
     });
   }, [
     evaluationType,
     baseSlots,
-    selectedService,
     workingHours,
     dayBookings,
+    dayEvals,
     dateIso,
     evalDuration,
+    selectedService,
   ]);
 
+  // Si el slot deja de ser válido, resetear
   useEffect(() => {
     if (slot && !availableSlots.includes(slot)) setSlot("");
   }, [availableSlots, slot]);
@@ -84,6 +111,14 @@ export const EvaluationForm: React.FC = () => {
     }
     if (evaluationType === "presencial" && !slot) {
       alert("Selecciona fecha y hora para la valoración presencial");
+      return;
+    }
+
+    // Revalidación anti-carrera en el submit
+    if (evaluationType === "presencial" && !availableSlots.includes(slot)) {
+      alert(
+        "El horario seleccionado ya no está disponible. Por favor, elige otro."
+      );
       return;
     }
 
