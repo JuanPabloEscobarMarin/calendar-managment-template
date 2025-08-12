@@ -72,8 +72,10 @@ export default function AdminDashboard() {
           (b as any).durationMinutes ??
           svc?.durationMinutes ??
           workingHours.slotMinutes;
+
         const start = new Date(b.dateTime);
         const end = new Date(start.getTime() + dur * 60 * 1000);
+
         return {
           id: b.id,
           kind: "booking",
@@ -81,10 +83,15 @@ export default function AdminDashboard() {
           end: end.toISOString(),
           serviceId: b.serviceId,
           serviceName: svc?.name ?? "Servicio",
-          price: Math.round((svc?.price ?? 0) * (b.sessions ?? 1)),
+          // 👇 precio por sesión (no multiplicar por sessions)
+          price: Math.round(svc?.price ?? 0),
           client: b.name,
           phone: b.phone,
           createdAt: (b as any).created_at,
+          // (opcional) si guardas serie:
+          // seriesId: (b as any).seriesId,
+          // sessionIndex: (b as any).sessionIndex,
+          // totalSessions: (b as any).totalSessions,
         };
       }),
     [bookings, svcMap, workingHours.slotMinutes]

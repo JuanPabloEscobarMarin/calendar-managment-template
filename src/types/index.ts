@@ -13,10 +13,11 @@ export interface Booking {
   phone: string;
   /** Fecha y hora seleccionadas en ISO 8601 (ej. "2025-08-15T14:30") */
   dateTime: string;
-  /** Número de sesiones reservadas; algunos servicios se venden en paquetes */
-  sessions?: number;
   /** Duración del servicio en minutos; opcional para facilitar comprobaciones del servidor */
   durationMinutes?: number;
+  seriesId?: string; // ID de la serie de sesiones, si aplica
+  sessionIndex?: number; // Índice de la sesión en la serie, si aplica
+  totalSessions?: number; // Total de sesiones en la serie, si aplica
 }
 
 /** Representa una solicitud de valoración o diagnóstico. */

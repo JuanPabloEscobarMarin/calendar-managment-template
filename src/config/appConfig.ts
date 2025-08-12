@@ -1,9 +1,4 @@
-/**
- * La configuración de la aplicación se centraliza en este archivo.  Definirla
- * aquí permite reutilizar la misma base de código para distintos negocios
- * simplemente modificando los valores y sustituyendo las imágenes en
- * `src/assets/images`.
- */
+import kevinjayImg from "../assets/images/kevinjay.png";
 
 export interface WorkingHours {
   /** IANA timezone for business logic */
@@ -37,7 +32,7 @@ export interface Service {
   durationMinutes: number; // opcional, si se desea calcular automáticamente
   /** Indica si es obligatorio realizar una valoración antes de reservar la cita */
   requiresEvaluation?: boolean;
-  sessionCount: number; // opcional, si se desea limitar el número de sesiones
+  sessionsCount: number; // opcional, si se desea limitar el número de sesiones
 }
 
 export interface Product {
@@ -96,7 +91,7 @@ export const defaultConfig: AppConfig = {
       duration: "60 min",
       durationMinutes: 60,
       requiresEvaluation: true,
-      sessionCount: 1,
+      sessionsCount: 1,
     },
     {
       id: "svc-2",
@@ -107,7 +102,7 @@ export const defaultConfig: AppConfig = {
       duration: "75 min",
       durationMinutes: 75,
       requiresEvaluation: false,
-      sessionCount: 3,
+      sessionsCount: 3,
     },
     {
       id: "svc-3",
@@ -118,7 +113,7 @@ export const defaultConfig: AppConfig = {
       duration: "50 min",
       durationMinutes: 50,
       requiresEvaluation: false,
-      sessionCount: 1,
+      sessionsCount: 1,
     },
     {
       id: "svc-4",
@@ -129,7 +124,7 @@ export const defaultConfig: AppConfig = {
       duration: "3 horas y 20 minutos",
       durationMinutes: 200,
       requiresEvaluation: false,
-      sessionCount: 1,
+      sessionsCount: 1,
     },
   ],
   products: [
@@ -150,6 +145,13 @@ export const defaultConfig: AppConfig = {
       name: "Minoxidil",
       description: "Crece el cabello y fortalece los folículos.",
       image: "/assets/images/minoxidil-facial.png",
+    },
+    {
+      id: "prd-4",
+      name: "KevinJay",
+      description: "Un KevinJay Chikito",
+      image: kevinjayImg,
+      price: 100000, // Precio opcional
     },
   ],
 };
