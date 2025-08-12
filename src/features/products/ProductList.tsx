@@ -1,6 +1,5 @@
-import React from 'react';
-import { useConfig } from '../../contexts/ConfigContext';
-
+import React from "react";
+import { useConfig } from "../../contexts/ConfigContext";
 /**
  * Lista los productos disponibles en el catálogo.  Muestra una imagen,
  * nombre y descripción.  Actualmente no ofrece funcionalidad de compra,
@@ -16,7 +15,10 @@ export const ProductList: React.FC = () => {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {products.map((prod) => (
-        <div key={prod.id} className="border rounded-lg p-4 shadow-sm bg-white flex flex-col">
+        <div
+          key={prod.id}
+          className="border rounded-lg p-4 shadow-sm bg-white flex flex-col"
+        >
           {prod.image && (
             <img
               src={prod.image}
@@ -24,8 +26,17 @@ export const ProductList: React.FC = () => {
               className="object-contain h-40 w-full mb-4 rounded"
             />
           )}
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{prod.name}</h3>
-          <p className="text-sm text-gray-600 mb-4 flex-grow">{prod.description}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            {prod.name}
+          </h3>
+          <p className="text-sm text-gray-600 mb-4 flex-grow">
+            {prod.description}
+          </p>
+          {prod.price && (
+            <div className="text-lg font-bold text-gray-900">
+              ${prod.price.toLocaleString()}
+            </div>
+          )}
         </div>
       ))}
     </div>

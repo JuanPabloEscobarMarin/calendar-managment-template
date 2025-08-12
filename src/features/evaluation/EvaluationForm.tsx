@@ -9,6 +9,7 @@ import {
 } from "../../utils/scheduling";
 import type { Evaluation } from "../../types";
 import { useBookings } from "../../hooks/useBookings";
+import { evalDuration } from "../../config/appConfig";
 
 export const EvaluationForm: React.FC = () => {
   const { services, workingHours } = useConfig();
@@ -60,9 +61,6 @@ export const EvaluationForm: React.FC = () => {
         })),
     [evaluations, dateIso]
   );
-
-  // Duración fija de valoración presencial
-  const evalDuration = 30;
 
   // Cálculo de disponibilidad combinando reservas + valoraciones presenciales
   const availableSlots = useMemo(() => {

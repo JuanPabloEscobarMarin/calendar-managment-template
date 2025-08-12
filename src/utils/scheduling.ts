@@ -25,7 +25,7 @@ export function toIsoDate(d: Date): string {
 
 /** Is the given date (local) a working day and not a holiday */
 export function isWorkingDate(date: Date, wh: WorkingHours): boolean {
-  const dow = date.getDay() === 0 ? 7 : date.getDay(); // 1..7 (Mon..Sun)
+  const dow = date.getDay() === 0 ? 7 : date.getDay();
   const okDow = wh.workingDays.includes(dow);
   const iso = toIsoDate(date);
   const notHoliday = !wh.holidays.includes(iso);
@@ -94,9 +94,7 @@ export function filterAvailableSlots(params: {
       const bStart = new Date(x.dateTime);
       const durMin = Math.max(
         1,
-        x.durationMinutes ??
-          service.durationMinutes ?? // fallback si faltara en DB
-          wh.slotMinutes
+        x.durationMinutes ?? service.durationMinutes ?? wh.slotMinutes
       );
       const bEnd = new Date(bStart.getTime() + durMin * 60 * 1000);
       return { bStart, bEnd };
