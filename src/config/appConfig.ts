@@ -37,6 +37,7 @@ export interface Service {
   durationMinutes: number; // opcional, si se desea calcular automáticamente
   /** Indica si es obligatorio realizar una valoración antes de reservar la cita */
   requiresEvaluation?: boolean;
+  sessionCount: number; // opcional, si se desea limitar el número de sesiones
 }
 
 export interface Product {
@@ -67,6 +68,8 @@ export interface AppConfig {
   /** Zona horaria del negocio, para mostrar correctamente las fechas */
   workingHours: WorkingHours;
 }
+/** Duración fija de las valoraciones presenciales en minutos */
+export const evalDuration = 60;
 
 export const defaultConfig: AppConfig = {
   siteName: "Barberia Booking",
@@ -89,20 +92,22 @@ export const defaultConfig: AppConfig = {
       name: "Limpieza facial",
       category: "Facial",
       description: "Tratamiento de limpieza profunda y exfoliación.",
-      price: 120,
+      price: 120000,
       duration: "60 min",
       durationMinutes: 60,
       requiresEvaluation: true,
+      sessionCount: 1,
     },
     {
       id: "svc-2",
       name: "Masaje relajante",
       category: "Corporal",
       description: "Masaje corporal completo para aliviar tensiones.",
-      price: 150,
+      price: 150000,
       duration: "75 min",
       durationMinutes: 75,
       requiresEvaluation: false,
+      sessionCount: 3,
     },
     {
       id: "svc-3",
@@ -113,6 +118,18 @@ export const defaultConfig: AppConfig = {
       duration: "50 min",
       durationMinutes: 50,
       requiresEvaluation: false,
+      sessionCount: 1,
+    },
+    {
+      id: "svc-4",
+      name: "Prueba de Tiempo",
+      category: "Reloj",
+      description: "Servicio de prueba de tiempo",
+      price: 40000,
+      duration: "3 horas y 20 minutos",
+      durationMinutes: 200,
+      requiresEvaluation: false,
+      sessionCount: 1,
     },
   ],
   products: [
